@@ -10,7 +10,7 @@ export class AtualizarCacheService {
 
   constructor(private readonly repo: ICacheRepository) {}
 
-  async execute(dto: PagamentoAssinaturaDTO): Promise<void> {
+  async atualizaAssinatura(dto: PagamentoAssinaturaDTO): Promise<void> {
     // Calcular Vencimento
     const dataValidade = new Date(dto.dataPagamento);
     dataValidade.setDate(dataValidade.getDate() + this.DIAS_VALIDADE);
@@ -22,7 +22,6 @@ export class AtualizarCacheService {
       dto.valorPago
     );
 
-    // Persistir
     await this.repo.atualizarAssinaturaCache(assinatura);
     
     this.logger.log(`✅ Cache Atualizado: ID ${dto.codAssinatura} válida até ${dataValidade.toLocaleDateString()}`);
