@@ -1,0 +1,81 @@
+services:
+  # 1. SERVIÇO DE FATURAMENTO
+  faturamento:
+    build: ./servico-faturamento
+    container_name: faturamento
+    restart: always
+    ports:
+      - "${FATURAMENTO_PORT}:${FATURAMENTO_PORT}"
+    environment:
+      - PORT=${FATURAMENTO_PORT}
+      
+      # Banco de Dados
+      - DATABASE_HOST=${FATURAMENTO_DB_HOST}
+      - DATABASE_NAME=${FATURAMENTO_DB_NAME}
+      - DATABASE_USER=${FATURAMENTO_DB_USER}
+      - DATABASE_PASSWORD=${FATURAMENTO_DB_PASS}
+      - DATABASE_PORT=${FATURAMENTO_DB_PORT}
+      - DATABASE_TYPE=${FATURAMENTO_DB_TYPE}
+      
+      # RabbitMQ
+      - RABBITMQ_URL=${RABBITMQ_URL}
+      - RABBITMQ_QUEUE=${RABBITMQ_FATURAMENTO_QUEUE}        # escuta
+      - RABBITMQ_GESTAO_QUEUE=${RABBITMQ_GESTAO_QUEUE}      # envia
+    networks:
+      - operadora-network
+
+  # 2. SERVIÇO DE GESTÃO
+  gestao:
+    build: ./servico-gestao
+    container_name: gestao
+    restart: always
+    ports:
+      - "${GESTAO_PORT}:${GESTAO_PORT}"
+    environment:
+      - PORT=${GESTAO_PORT}
+      
+      # Banco de Dados
+      - DATABASE_HOST=${GESTAO_DB_HOST}
+      - DATABASE_NAME=${GESTAO_DB_NAME}
+      - DATABASE_USER=${GESTAO_DB_USER}
+      - DATABASE_PASSWORD=${GESTAO_DB_PASS}
+      - DATABASE_PORT=${GESTAO_DB_PORT}
+      - DATABASE_TYPE=${GESTAO_DB_TYPE}
+      
+      # RabbitMQ
+      - RABBITMQ_URL=${RABBITMQ_URL}
+      - RABBITMQ_QUEUE=${RABBITMQ_GESTAO_QUEUE}                     # escuta
+      - RABBITMQ_FATURAMENTO_QUEUE=${RABBITMQ_FATURAMENTO_QUEUE}    # envia
+    networks:
+      - operadora-network
+
+  # 3. API GATEWAY
+  gateway:
+    build: ./api-gateway
+    container_name: gateway
+    restart: always
+    ports:
+      - "${GATEWAY_PORT}:${GATEWAY_PORT}"
+    depends_on:
+      - faturamento
+      - gestao
+    environment:
+      - PORT=${GATEWAY_PORT}
+      
+      # RabbitMQ
+      - RABBITMQ_URL=${RABBITMQ_URL}
+      - RABBITMQ_FATURAMENTO_QUEUE=${RABBITMQ_FATURAMENTO_QUEUE}
+      - RABBITMQ_GESTAO_QUEUE=${RABBITMQ_GESTAO_QUEUE}
+      
+      # nome do service do docker
+      - GESTAO_HOST=gestao
+      - GESTAO_PORT=${GESTAO_PORT}
+      - FATURAMENTO_HOST=faturamento
+      - FATURAMENTO_PORT=${FATURAMENTO_PORT}
+    networks:
+      - operadora-network
+
+# Rede Virtual Interna
+networks:
+  operadora-network:
+    driver: bridge
