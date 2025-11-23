@@ -21,6 +21,19 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         }),
         inject: [ConfigService],
       },
+
+      {
+        name: 'PLANOS_ATIVOS_SERVICE',
+        useFactory: (config: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [config.get('RABBITMQ_URL')],
+            queue: config.get('RABBITMQ_PLANOS_ATIVOS_QUEUE') || 'planos_ativos_queue', 
+            queueOptions: { durable: false },
+          },
+        }),
+        inject: [ConfigService],
+      },
     ]),
   ],
   exports: [ClientsModule],

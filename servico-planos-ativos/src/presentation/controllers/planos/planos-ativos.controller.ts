@@ -16,7 +16,7 @@ export class PlanosAtivosController {
   ) {}
 
   // escuta (RabbitMQ)
-  @EventPattern('PagamentoPlanoServicoGestao')
+  @EventPattern('PagamentoPlanoServicoPlanosAtivos')
   async handleEvento(@Payload() data: PlanoAtivoDTO) {
     await this.atualizarCacheUC.run(data);
   }

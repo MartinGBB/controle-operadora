@@ -9,7 +9,8 @@ import { ClientProxy } from '@nestjs/microservices';
 export class ServicoPagamento {
   constructor(
     private registrarPagamentoRepository: IRegistrarPagamentoRepository, 
-    @Inject('GESTAO_SERVICE') private readonly brokerService: ClientProxy
+    @Inject('GESTAO_SERVICE') private readonly brokerService: ClientProxy,
+    @Inject('PLANOS_ATIVOS_SERVICE') private readonly brokerServicePlanosAtivos: ClientProxy
   ) {}
 
   async registrarPagamento(pagamento: PagamentoVO): Promise<void> {
@@ -31,7 +32,10 @@ export class ServicoPagamento {
 
     await this.registrarPagamentoRepository.registrarPagamento(pagamentoModel);
 
+    // Emite para Gestão
     this.brokerService.emit('PagamentoPlanoServicoGestao', pagamentoModel);
+    // Emite para Planos Ativos
+    this.brokerServicePlanosAtivos.emit('PagamentoPlanoServicoPlanosAtivos', pagamentoModel);
     return;
   }
 }
