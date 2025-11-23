@@ -1,9 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Dependencies, Injectable, Logger } from '@nestjs/common';
 import { AssinaturaCache } from '../../domain/entities/assinatura-cache.model';
 import { PagamentoAssinaturaDTO } from '../../domain/vo/PagamentoAssinatura';
-import { ICacheRepository } from '../../domain/repositories/ICache.repository';
+import { ICacheRepository } from '../repositories/ICacheRepository.repository';
 
 @Injectable()
+@Dependencies(ICacheRepository)
 export class AtualizarCacheService {
   private readonly logger = new Logger(AtualizarCacheService.name);
   private readonly DIAS_VALIDADE = 30; // 30 dias

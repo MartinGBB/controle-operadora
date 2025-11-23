@@ -10,7 +10,7 @@ async function bootstrap() {
 
   // Conecta ao RabbitMQ
   const rabbitmqUrl = configService.get('RABBITMQ_URL') || 'amqp://localhost:5672';
-  const rabbitmqQueue = configService.get('RABBITMQ_QUEUE') || 'planos_ativos_queue';
+  const rabbitmqQueue = configService.get('RABBITMQ_PLANOS_ATIVOS_QUEUE') || 'planos_ativos_queue';
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
@@ -23,7 +23,7 @@ async function bootstrap() {
 
   await app.startAllMicroservices();
   await app.listen(port);
-  console.log(`🚀 Planos Ativos rodando na porta ${port} e ouvindo na fila ${rabbitmqQueue}`);
+  console.log(`🚀 Planos Ativos rodando na porta: ${port} e ouvindo na fila: ${rabbitmqQueue}`);
 }
 
 bootstrap();

@@ -1,10 +1,16 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { PlanosAtivosModule } from './presentation/controllers/planos/planos-ativos.module';
+import { memoryDbProvider } from './infra/config/memory-db.provider';
+import { ICacheRepository } from './domain/repositories/ICacheRepository.repository';
+import { CacheMemoryRepository } from './infra/database/repositories/cache-memory.repository';
+import { ConfigModule } from '@nestjs/config';
+import { DatabaseModule } from './infra/config/database.module';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    DatabaseModule,
+    PlanosAtivosModule,
+  ],
 })
 export class AppModule {}
