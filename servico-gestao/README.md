@@ -1,98 +1,124 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Serviço de Gestão
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Este é o microserviço central do sistema, responsável pelo gerenciamento do núcleo do negócio: **Clientes**, **Planos** e **Assinaturas**. Ele orquestra as regras de negócio fundamentais, como a criação de novas assinaturas, controle de fidelidade e consulta de dados cadastrais.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 📋 Funcionalidades
 
-## Description
+- **Gestão de Clientes**: Cadastro e consulta de clientes.
+- **Gestão de Planos**: Administração dos planos disponíveis.
+- **Gestão de Assinaturas**:
+  - Criação de novas assinaturas com cálculo automático de fidelidade.
+  - Consulta de assinaturas por tipo (Ativa/Cancelada), cliente ou plano.
+- **Integração**: Recebe notificações de pagamentos para manter o histórico atualizado.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 🚀 Tecnologias
 
-## Project setup
+- [NestJS](https://nestjs.com/) - Framework Node.js robusto e escalável.
+- [TypeORM](https://typeorm.io/) - ORM para persistência de dados.
+- [MySQL](https://www.mysql.com/) - Banco de dados relacional.
+- [RabbitMQ](https://www.rabbitmq.com/) - Message Broker para comunicação assíncrona.
+- [Swagger](https://swagger.io/) - Documentação interativa da API.
+- [Docker](https://www.docker.com/) - Containerização da aplicação.
+- TypeScript - Linguagem base.
 
-```bash
-$ npm install
+## 🏗 Arquitetura e Design
+
+Este projeto foi meticulosamente desenhado seguindo princípios de engenharia de software moderna para garantir manutenibilidade, testabilidade e escalabilidade.
+
+### Clean Architecture
+
+A aplicação é dividida em camadas concêntricas, respeitando a regra de dependência (de fora para dentro):
+
+1.  **Domain**: O núcleo. Contém as Entidades (`AssinaturaModel`), Objetos de Valor (`CriarAssinaturaVO`), Interfaces de Repositório (`IAssinaturaRepository`) e Factories (`AssinaturaFactory`). Não depende de frameworks ou bibliotecas externas.
+2.  **Application**: Contém os Casos de Uso (`CriarAssinatura_UC`, `ListarAssinaturasPorCliente_UC`). Orquestra o fluxo de dados entre o domínio e o mundo externo.
+3.  **Infra**: Implementações concretas das interfaces do domínio (ex: Repositórios TypeORM) e configurações de banco de dados.
+4.  **Presentation**: A camada mais externa, responsável por receber as requisições (Controladores HTTP e Consumers RabbitMQ) e converter dados.
+
+### Domain-Driven Design (DDD)
+
+Aplicamos conceitos de DDD para modelar a complexidade do negócio:
+
+- **Entities**: Objetos com identidade única e ciclo de vida (ex: `Assinatura`, `Cliente`).
+- **Value Objects (VOs)**: Objetos imutáveis definidos por seus atributos (ex: `CriarAssinaturaVO`), usados para encapsular dados de entrada e garantir integridade.
+- **Repositories**: Abstrações para acesso a dados, permitindo que o domínio permaneça agnóstico à persistência.
+- **Factories**: Encapsulam a lógica complexa de criação de objetos (ex: `AssinaturaFactory` define a data de fidelidade ao criar uma assinatura).
+
+### SOLID Principles
+
+- **SRP (Single Responsibility Principle)**: Cada classe tem um único motivo para mudar. Ex: `AssinaturaController` lida apenas com HTTP/RPC, enquanto `CriarAssinatura_UC` lida apenas com a regra de negócio da criação.
+- **OCP (Open/Closed Principle)**: O código é aberto para extensão, mas fechado para modificação. Novos casos de uso podem ser adicionados sem alterar os existentes.
+- **LSP (Liskov Substitution Principle)**: As implementações de repositório podem ser substituídas por outras (ex: Mock para testes) sem quebrar a aplicação, graças ao uso de interfaces.
+- **ISP (Interface Segregation Principle)**: Interfaces focadas (ex: `IAssinaturaRepository`, `IClienteRepository`) evitam que classes dependam de métodos que não usam.
+- **DIP (Dependency Inversion Principle)**: Os módulos de alto nível (Casos de Uso) não dependem de módulos de baixo nível (Infraestrutura); ambos dependem de abstrações (Interfaces de Domínio).
+
+### Padrões de Projeto
+
+- **Repository Pattern**: Desacopla a lógica de negócio da lógica de acesso a dados.
+- **Factory Pattern**: Centraliza a lógica de criação de objetos complexos (`AssinaturaFactory`).
+- **Dependency Injection**: O NestJS gerencia as dependências, facilitando o teste e a modularização.
+- **Decorator Pattern**: Amplamente usado pelo NestJS (`@Controller`, `@Injectable`) para adicionar metadados e comportamento às classes de forma declarativa.
+
+## ⚙️ Configuração
+
+Crie um arquivo `.env` na raiz:
+
+```env
+DATABASE_TYPE=mysql
+DATABASE_HOST=db_host
+DATABASE_PORT=db_port
+DATABASE_USER=db_user
+DATABASE_PASSWORD=db_password
+DATABASE_NAME=db_name
+PORT=3001
+RABBITMQ_URL=rabbitmq_url
+RABBITMQ_FATURAMENTO_QUEUE=faturamento_queue
+RABBITMQ_GESTAO_QUEUE=gestao_queue
 ```
 
-## Compile and run the project
+## 📦 Instalação e Execução
 
 ```bash
-# development
-$ npm run start
+# Instalar dependências
+npm install
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+# Rodar em desenvolvimento
+npm run start
 ```
 
-## Run tests
+## 🔌 Pontos de Entrada
+
+O serviço expõe endpoints HTTP e também escuta comandos via RabbitMQ.
+
+### Documentação Swagger
+
+Acesse `http://localhost:3001/api` para visualizar a documentação interativa completa.
+
+### Principais Endpoints HTTP
+
+| Método | Rota                                 | Descrição                                            |
+| :----- | :----------------------------------- | :--------------------------------------------------- |
+| `POST` | `/gestao/assinatura`                 | Cria uma nova assinatura.                            |
+| `GET`  | `/gestao/assinatura/:tipo`           | Lista assinaturas por tipo (`ATIVAS`, `CANCELADAS`). |
+| `GET`  | `/gestao/assinaturascliente/:codCli` | Lista assinaturas de um cliente específico.          |
+| `GET`  | `/gestao/assinaturasplano/:codPlano` | Lista assinaturas de um plano específico.            |
+
+### Mensageria (RabbitMQ)
+
+**MessagePatterns (RPC):**
+
+- `criar_assinatura`: Cria uma assinatura (mesmo payload do POST).
+- `listar_assinaturas_tipo`: Retorna assinaturas por tipo.
+- `listar_assinaturas_cliente`: Retorna assinaturas de um cliente.
+- `listar_assinaturas_plano`: Retorna assinaturas de um plano.
+
+## 🐳 Docker
+
+O serviço está pronto para ser containerizado.
 
 ```bash
-# unit tests
-$ npm run test
+# Construir a imagem
+docker build -t servico-gestao .
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+# Rodar o container
+docker run -p 3001:3001 --env-file .env servico-gestao
 ```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
