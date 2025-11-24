@@ -1,4 +1,4 @@
-import { Controller, Inject, Post, HttpCode, Body, Get, Param } from "@nestjs/common";
+import { Controller, Inject, Post, HttpCode, Body, Get, Param, ParseIntPipe } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { firstValueFrom } from "rxjs";
 
@@ -8,10 +8,10 @@ export class PlanosAtivosController {
     @Inject('PLANOS_ATIVOS_SERVICE') private readonly client: ClientProxy,
   ) {}
 
-  @Get(':codeAss')
-  async verificarAssinaturaAtiva(@Param('codeAss') codeAss: number) {
+  @Get(':codAss')
+  async verificarAssinaturaAtiva(@Param('codAss', ParseIntPipe) codAss: number) {
     const ativa = await firstValueFrom(
-      this.client.send('verificar_assinatura_ativa', { codAss: codeAss }),
+      this.client.send('verificar_assinatura_ativa', { codAss: codAss }),
       { defaultValue: false } 
     );
 
