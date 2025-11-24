@@ -206,9 +206,20 @@ Com o projeto rodando, você pode acessar a documentação interativa (Swagger) 
 
 ---
 
-## 📝 Licença
+## 📬 Testando com Postman/Insomnia
 
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+Para facilitar a validação dos endpoints e fluxos do sistema, foi incluído um arquivo de coleção do Postman pronto para uso.
+Localize o arquivo `postman_collection.json` na raiz deste projeto.
+
+**A coleção inclui exemplos prontos para:**
+
+- Listar clientes e planos (Gestão).
+- Atualizar custos (Gestão).
+- Criar assinaturas (Gestão).
+- **Registrar Pagamento** (Faturamento) -> Dispara o fluxo assíncrono.
+- ## Verificar status da assinatura (Planos Ativos).
+
+## 📝 Licença
 
 Desenvolvido por Martin Brazón como parte das atividades acadêmicas da Pontifícia Universidade Católica do Rio Grande do Sul (PUCRS).
 
