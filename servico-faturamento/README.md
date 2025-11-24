@@ -113,3 +113,15 @@ Após o registro bem-sucedido de um pagamento, o serviço emite os seguintes eve
 | ----------------------------------- | ------------------------ | -------------------------------------------------------------------- |
 | `PagamentoPlanoServicoGestao`       | Serviço de Gestão        | Notifica para fins de histórico e controle administrativo.           |
 | `PagamentoPlanoServicoPlanosAtivos` | Serviço de Planos Ativos | Notifica para atualização imediata do cache de status da assinatura. |
+
+## 🐳 Docker
+
+O serviço está pronto para ser containerizado.
+
+```bash
+# Construir a imagem
+docker build -t servico-faturamento .
+
+# Rodar o container
+docker run -p 3002:3002 --env-file .env servico-faturamento
+```

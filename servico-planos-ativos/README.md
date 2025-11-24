@@ -59,3 +59,15 @@ npm run start
 | Padrão                       | Payload              | Retorno              | Descrição                              |
 | ---------------------------- | -------------------- | -------------------- | -------------------------------------- |
 | `verificar_assinatura_ativa` | `{ codAss: number }` | `{ ativa: boolean }` | Verifica se uma assinatura está ativa. |
+
+## 🐳 Docker
+
+O serviço está pronto para ser containerizado.
+
+```bash
+# Construir a imagem
+docker build -t servico-planos-ativos .
+
+# Rodar o container
+docker run -p 3003:3003 --env-file .env servico-planos-ativos
+```
