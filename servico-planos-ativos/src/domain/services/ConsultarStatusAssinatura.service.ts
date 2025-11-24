@@ -1,21 +1,28 @@
-import { AssinaturaCache } from '../entities/assinatura-cache.model';
+import { PagamentoAssinaturaVO } from '../vo/PagamentoAssinatura';
 import { ICacheRepository } from '../repositories/ICacheRepository.repository';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Dependencies } from '@nestjs/common';
 
 @Injectable()
 @Dependencies(ICacheRepository)
 export class ConsultarStatusService {
+  private readonly logger = new Logger(ConsultarStatusService.name);
   constructor(private readonly cacheRepo: ICacheRepository) {}
+
   async consultarStatusAssinatura(codAssinatura: number): Promise<boolean> {
     const assinatura = await this.cacheRepo.buscarAssinaturaCache(codAssinatura);
+    
+    if (!assinatura) {
+      this.logger.log(`Assinatura não encontrada - CodAss: ${codAssinatura}`);
+      return false;
+    } else {
+      this.logger.log(`Assinatura encontrada: ${JSON.stringify(assinatura)}`);
+    }
 
-    if (!assinatura) return false; // Não existe no cache = Inativo
-
-    const assinaturaConvert = new AssinaturaCache(
+    const assinaturaConvert = new PagamentoAssinaturaVO(
       assinatura.codAssinatura,
       assinatura.dataPagamento,
-      assinatura.valorPago
+      assinatura.valorPago,
     );
 
     return assinaturaConvert.estaAtiva();

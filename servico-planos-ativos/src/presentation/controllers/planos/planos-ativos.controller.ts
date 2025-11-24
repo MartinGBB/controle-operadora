@@ -24,7 +24,7 @@ export class PlanosAtivosController {
   // responde (Gateway chama via .send)
   @MessagePattern('verificar_assinatura_ativa')
   async handleConsulta(@Payload() data: { codAss: number }) {
-    const estaAtiva = await this.consultarStatusUC.run(Number(data.codAss));
-    return { ativa: estaAtiva };
+    const estaAtiva = await this.consultarStatusUC.run(data.codAss);
+    return estaAtiva;
   }
 }

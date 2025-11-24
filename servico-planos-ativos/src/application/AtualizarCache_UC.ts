@@ -1,7 +1,7 @@
 import { AtualizarCacheService } from "src/domain/services/AtualizarCache.service";
-import { PagamentoAssinaturaDTO } from "src/domain/vo/PagamentoAssinatura";
 import { Injectable } from "@nestjs/common";
 import { Dependencies } from "@nestjs/common";
+import { PagamentoAssinaturaDTO } from "./dtos/PagamentoAssinatura.dto";
 
 @Injectable()
 @Dependencies(AtualizarCacheService)
