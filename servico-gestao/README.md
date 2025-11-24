@@ -63,16 +63,19 @@ Aplicamos conceitos de DDD para modelar a complexidade do negócio:
 Crie um arquivo `.env` na raiz:
 
 ```env
+DATABASE_TYPE=mysql
+DATABASE_HOST=db_host
+DATABASE_PORT=db_port
+DATABASE_USER=db_user
+DATABASE_PASSWORD=db_password
+DATABASE_NAME=db_name
+
 PORT=3001
-RABBITMQ_URL=amqp://localhost:5672
+
+RABBITMQ_URL=rabbitmq_url
+RABBITMQ_FATURAMENTO_QUEUE=faturamento_queue
 RABBITMQ_GESTAO_QUEUE=gestao_queue
 
-# Banco de Dados
-DB_HOST=localhost
-DB_PORT=3306
-DB_USERNAME=root
-DB_PASSWORD=senha
-DB_DATABASE=gestao_db
 ```
 
 ## 📦 Instalação e Execução
@@ -82,11 +85,7 @@ DB_DATABASE=gestao_db
 npm install
 
 # Rodar em desenvolvimento
-npm run start:dev
-
-# Rodar em produção
-npm run build
-npm run start:prod
+npm run start
 ```
 
 ## 🔌 Pontos de Entrada
