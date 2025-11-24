@@ -74,6 +74,7 @@ services:
     depends_on:
       - faturamento
       - gestao
+      - planos-ativos
     environment:
       - PORT=${GATEWAY_PORT}
       
@@ -88,6 +89,8 @@ services:
       - GESTAO_PORT=${GESTAO_PORT}
       - FATURAMENTO_HOST=faturamento
       - FATURAMENTO_PORT=${FATURAMENTO_PORT}
+      - PLANOS_ATIVOS_HOST=planos-ativos
+      - PLANOS_ATIVOS_PORT=${PLANOS_ATIVOS_PORT}
     networks:
       - operadora-network
 
