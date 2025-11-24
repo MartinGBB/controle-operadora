@@ -1,98 +1,115 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Serviço de Faturamento
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Este microserviço é responsável pelo registro e processamento de pagamentos no sistema de controle de operadora. Ele atua como o ponto central para a entrada de dados financeiros, validando as informações, persistindo os registros e notificando outros serviços interessados sobre a confirmação dos pagamentos.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 📋 Funcionalidades
 
-## Description
+- **Registro de Pagamentos**: Recebe dados de pagamentos via HTTP ou Mensageria.
+- **Validação de Regras de Negócio**: Garante a integridade dos dados (datas válidas, valores positivos, etc.).
+- **Persistência**: Salva o histórico de pagamentos no banco de dados.
+- **Notificação de Eventos**: Emite eventos para outros microserviços (`Gestão` e `Planos Ativos`) após o sucesso do registro.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 🚀 Tecnologias
 
-## Project setup
+- [NestJS](https://nestjs.com/) - Framework Node.js
+- [TypeORM](https://typeorm.io/) - ORM para interação com o banco de dados
+- [MySQL](https://www.mysql.com/) - Banco de dados relacional
+- [RabbitMQ](https://www.rabbitmq.com/) - Message Broker para comunicação assíncrona
+- [Docker](https://www.docker.com/) - Containerização
+- TypeScript
 
-```bash
-$ npm install
+## 🏗 Arquitetura
+
+O projeto foi desenhado seguindo os princípios da **Clean Architecture** e **Domain-Driven Design (DDD)**, garantindo desacoplamento e facilidade de manutenção. A estrutura é dividida nas seguintes camadas:
+
+- **Application**: Contém os Casos de Uso (`RegistrarPagamento_UC`), orquestrando a lógica da aplicação sem depender de detalhes de infraestrutura.
+- **Domain**: O coração do sistema. Contém as Entidades (`PagamentoModel`), Objetos de Valor (`PagamentoVO`) e Interfaces de Repositório (`IRegistrarPagamentoRepository`). Aqui residem as regras de negócio puras.
+- **Infra**: Implementações concretas, como repositórios com TypeORM e configurações de banco de dados.
+- **Presentation**: Responsável pela entrada de dados, contendo os Controladores (`PagamentoController`) e DTOs.
+
+### Boas Práticas Adotadas
+
+- **Injeção de Dependência**: Uso extensivo do container do NestJS para gerenciar dependências, facilitando testes e modularização.
+- **SOLID**: Aplicação dos princípios, especialmente:
+  - _Single Responsibility Principle (SRP)_: Cada classe tem uma única responsabilidade (ex: Use Case apenas orquestra, Service valida e persiste).
+  - _Dependency Inversion Principle (DIP)_: O domínio depende de abstrações (interfaces), não de implementações concretas.
+- **Tratamento de Erros Centralizado**: Uso de filtros de exceção (`HttpExceptionFilter`) e erros de domínio personalizados (`RegraNegocioError`).
+
+## ⚙️ Configuração
+
+Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis (exemplo):
+
+```env
+DATABASE_HOST=sql10.freesqldatabase.com
+DATABASE_NAME=name
+DATABASE_USER=user
+DATABASE_PASSWORD=password
+DATABASE_PORT=3306
+DATABASE_TYPE=mysql
+
+PORT=3002
+
+RABBITMQ_URL=amqp://localhost:5672
+RABBITMQ_FATURAMENTO_QUEUE=faturamento_queue
+RABBITMQ_GESTAO_QUEUE=gestao_queue
+RABBITMQ_PLANOS_ATIVOS_QUEUE=planos_ativos_queue
+
 ```
 
-## Compile and run the project
+## 📦 Instalação
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
 
-## Run tests
+## ▶️ Execução
+
+### Desenvolvimento
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm run start
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Produção
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm run build
+npm run start:prod
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## 🔌 Pontos de Entrada (API & Mensageria)
 
-## Resources
+O serviço aceita requisições tanto via HTTP quanto via RabbitMQ, processando a mesma estrutura de dados.
 
-Check out a few resources that may come in handy when working with NestJS:
+### HTTP Endpoint
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+**POST** `/registrarpagamento`
 
-## Support
+**Corpo da Requisição (JSON):**
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```json
+{
+  "dia": 24,
+  "mes": 11,
+  "ano": 2025,
+  "codAssinatura": 123,
+  "valorPago": 99.9
+}
+```
 
-## Stay in touch
+### Mensageria (RabbitMQ)
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+**MessagePattern:** `registrar_pagamento`
 
-## License
+**Payload:**
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Mesma estrutura do JSON acima (`PagamentoDTO`).
+
+## 📡 Eventos Emitidos
+
+Após o registro bem-sucedido de um pagamento, o serviço emite os seguintes eventos para o barramento (RabbitMQ):
+
+| Evento                              | Destino                  | Descrição                                                            |
+| ----------------------------------- | ------------------------ | -------------------------------------------------------------------- |
+| `PagamentoPlanoServicoGestao`       | Serviço de Gestão        | Notifica para fins de histórico e controle administrativo.           |
+| `PagamentoPlanoServicoPlanosAtivos` | Serviço de Planos Ativos | Notifica para atualização imediata do cache de status da assinatura. |
