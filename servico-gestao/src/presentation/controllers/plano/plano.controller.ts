@@ -4,6 +4,7 @@ import {
   Controller,
   Dependencies,
   Get,
+  Logger,
   Param,
   Patch,
 } from '@nestjs/common';
@@ -12,6 +13,7 @@ import { AtualizarCustoPlano_UC } from 'src/application/planos/AtualizarCustoPla
 import { ListarPlanos_UC } from 'src/application/planos/ListarPlanos_UC';
 import { PlanoResponseDTO } from './dto/Plano.dto';
 import { AtualizarCustoPlanoRequestDTO } from './dto/AtualizarCusto.dto';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 
 @ApiTags('Planos')
 @Controller('planos')
@@ -32,11 +34,26 @@ export class PlanoController {
     return this.planoUC.run();
   }
 
+
+  @MessagePattern('listar_planos')
+  async listarRPC() {
+    const logger = new Logger(PlanoController.name);
+    logger.log('RabbitMQ: Listando planos...');
+    return await this.planoUC.run();
+  }
+
   @Patch(':codigo')
   @ApiOperation({ summary: 'Atualizar custo mensal do plano' })
   @ApiResponse({ status: 200, description: 'Custo atualizado com sucesso.', type: PlanoResponseDTO })
   @Bind(Param('codigo'), Body())
   atualizarCusto(codigo: number, body: AtualizarCustoPlanoRequestDTO): Promise<PlanoResponseDTO> {
     return this.atualizarCustoUC.run(codigo, body.custoMensal);
+  }
+
+  @MessagePattern('atualizar_custo_plano')
+  atualizarCustoRPC(@Payload() data: { codigo: number, custoMensal: number }) {
+    const logger = new Logger(PlanoController.name);
+    logger.log('RabbitMQ: Atualizando custo do plano...');
+    return this.atualizarCustoUC.run(data.codigo, data.custoMensal);
   }
 }

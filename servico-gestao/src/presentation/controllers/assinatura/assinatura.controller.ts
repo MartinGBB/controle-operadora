@@ -20,6 +20,7 @@ import {
   CriarAssinaturaResponseDTO,
 } from './dto/CriarAssinatura.dto';
 import { ListarAssinaturaResposeDTO } from './dto/ListarAssinaturaResponse.dto';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 
 @ApiTags('Assinaturas')
 @Controller()
@@ -51,11 +52,21 @@ export class AssinaturaController {
     return this.listarPorTipoUC.run(tipo);
   }
 
+  @MessagePattern('listar_assinaturas_tipo')
+  async buscarPorTipoRPC(@Payload() tipo: AssinaturaTipo) {
+    return this.listarPorTipoUC.run(tipo);
+  }
+
   @Post('assinatura')
   @ApiOperation({ summary: 'Criar nova assinatura' })
   @ApiResponse({ status: 201, description: 'Assinatura criada com sucesso.', type: CriarAssinaturaResponseDTO })
   @Bind(Body())
   criarAssinatura(request: CriarAssinaturaRequestDTO): Promise<CriarAssinaturaResponseDTO> {
+    return this.criarUC.run(request);
+  }
+
+  @MessagePattern('criar_assinatura')
+  criarAssinaturaRPC(@Payload() request: CriarAssinaturaRequestDTO) {
     return this.criarUC.run(request);
   }
 
@@ -67,11 +78,21 @@ export class AssinaturaController {
     return this.listarPorClienteUC.run(codCli);
   }
 
+  @MessagePattern('listar_assinaturas_cliente')
+  async buscarPorClienteRPC(@Payload() codCli: number) {
+    return this.listarPorClienteUC.run(codCli);
+  }
+
   @Get('assinaturasplano/:codPlano')
   @ApiOperation({ summary: 'Listar assinaturas de um plano' })
   @ApiResponse({ status: 200, description: 'Lista de assinaturas do plano.' })
   @Bind(Param('codPlano', ParseIntPipe))
   async buscarPorPlano(codPlano: number): Promise<ListarAssinaturaResposeDTO[]> {
+    return this.listarPorPlanoUC.run(codPlano);
+  }
+
+  @MessagePattern('listar_assinaturas_plano')
+  async buscarPorPlanoRPC(@Payload() codPlano: number) {
     return this.listarPorPlanoUC.run(codPlano);
   }
 }
