@@ -1,5 +1,5 @@
 import { Provider } from '@nestjs/common';
-import { AssinaturaCache } from '../../domain/entities/assinatura-cache.model';
+import { PagamentoAssinatura } from '../database/entities/Pagamento.entity';
 
 // Simula uma string de conexão
 export const DATA_SOURCE = 'MEMORY_DB_CONNECTION';
@@ -9,6 +9,6 @@ export const memoryDbProvider: Provider = {
   provide: DATA_SOURCE,
   useFactory: () => {
     // instância única (Singleton) do Map
-    return new Map<number, AssinaturaCache>();
+    return new Map<number, PagamentoAssinatura>();
   },
 };

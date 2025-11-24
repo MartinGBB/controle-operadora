@@ -1,6 +1,6 @@
-import { PagamentoAssinaturaDTO } from "../vo/PagamentoAssinatura";
+import { PagamentoAssinaturaModel } from "../entities/PagamentoAssinatura.model";
 
 export abstract class ICacheRepository {
-  abstract atualizarAssinaturaCache(pagamento: PagamentoAssinaturaDTO): Promise<void>;
-  abstract buscarAssinaturaCache(codAssinatura: number): Promise<PagamentoAssinaturaDTO | undefined>;
+  abstract atualizarAssinaturaCache(pagamento: PagamentoAssinaturaModel): Promise<void>;
+  abstract buscarAssinaturaCache(codAssinatura: number): Promise<PagamentoAssinaturaModel | undefined>;
 }

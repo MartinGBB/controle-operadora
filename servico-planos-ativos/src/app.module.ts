@@ -1,8 +1,5 @@
 import { Module } from '@nestjs/common';
 import { PlanosAtivosModule } from './presentation/controllers/planos/planos-ativos.module';
-import { memoryDbProvider } from './infra/config/memory-db.provider';
-import { ICacheRepository } from './domain/repositories/ICacheRepository.repository';
-import { CacheMemoryRepository } from './infra/database/repositories/cache-memory.repository';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './infra/config/database.module';
 
